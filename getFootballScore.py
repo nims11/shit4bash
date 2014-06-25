@@ -7,7 +7,8 @@ import webapp2
 
 def getScoreString():
     url = 'http://www.livefootball.com/'
-    html = lxml.html.parse(url)
+    content = urllib2.urlopen(url).read()
+    html = lxml.html.fromstring(content)
 
     matches = html.xpath('//div[contains(@class,"mEl")]//dl')
     ret = []
