@@ -1,29 +1,38 @@
 #!/usr/bin/python
 import sys
 import urllib2
-import libxml2
+#import libxml2
+import lxml.html
+import webapp2
 
-url = 'http://www.livefootball.com/'
-f = urllib2.urlopen(url)
-html = f.read()
-f.close()
+def getScoreString():
+    url = 'http://www.livefootball.com/'
+    html = lxml.html.parse(url)
 
-parse_options = libxml2.HTML_PARSE_RECOVER + \
-		libxml2.HTML_PARSE_NOERROR + \
-		libxml2.HTML_PARSE_NOWARNING
-doc = libxml2.htmlReadDoc(html, '', None, parse_options)
-matches = doc.xpathEval('//div[contains(@class,"mEl")]//dl')
+    matches = html.xpath('//div[contains(@class,"mEl")]//dl')
+    ret = []
+    for match in matches:
+        indiData = match.xpath('.//dd')
+        parsedData = []
+        for field in indiData:
+            parsedData.append(''.join(map(str, field.xpath('.//text()'))))
+        for i,x in enumerate(parsedData):
+            if x == 'v':
+                parsedData[i] = '  v  '
+                
+        out = '\t'.join(parsedData).strip()
+        if len(out) > 0:
+            ret.append(out)
+    return '\n'.join(ret)
 
-for match in matches:
-    indiData = match.xpathEval('.//dd')
-    parsedData = []
-    for field in indiData:
-        parsedData.append(''.join(map(str, field.xpathEval('.//text()'))))
-    for i,x in enumerate(parsedData):
-        if x == 'v':
-            parsedData[i] = '  v'
-            
-    out = '\t'.join(parsedData).strip()
-    if len(out) > 0:
-        print out
+class getFootballScore(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(getScoreString())
 
+
+application = webapp2.WSGIApplication([
+        ('/', getFootballScore),
+        ], debug=False)
+
+print getScoreString()
