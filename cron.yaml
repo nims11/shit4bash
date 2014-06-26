@@ -1,0 +1,4 @@
+cron:
+- description: update football matches
+  url: /football/update
+  schedule: every 1 mins

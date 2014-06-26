@@ -5,6 +5,9 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /football/update
+  login: admin
+  script: getFootballScore.application
 - url: /.*
   script: getFootballScore.application
 
