@@ -12,7 +12,7 @@ class getFootballScore(webapp2.RequestHandler):
 class updateFootballScore(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
-        memcache.add('footballScores', getFootballScoreString())
+        memcache.set('footballScores', getFootballScoreString())
         self.response.write('Updated!')
 
 application = webapp2.WSGIApplication([
